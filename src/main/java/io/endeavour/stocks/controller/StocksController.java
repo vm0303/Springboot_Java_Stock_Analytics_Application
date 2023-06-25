@@ -2,6 +2,8 @@ package io.endeavour.stocks.controller;
 
 
 import io.endeavour.stocks.service.StockAnalyticsService;
+import io.endeavour.stocks.vo.StockFundamentalsRequest;
+import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVo;
 import io.endeavour.stocks.vo.StocksHistoryRequest;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -62,5 +64,17 @@ public class StocksController {
         }
         return stockAnalyticsService.getStocksPriceHistory(stocksHistoryRequest.getTickerSymbolList(),
                 stocksHistoryRequest.getFromDate(), stocksHistoryRequest.getToDate());
+    }
+
+    @PostMapping(value = "/getStockFundamentals")
+    public List<StockFundamentalsVO> getStockFundamentals(@RequestBody StockFundamentalsRequest stockFundamentalsRequest)
+    {
+        if(stockFundamentalsRequest.getTickerSymbolList() == null)
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Array list of ticker symbols cannot be null");
+        }
+      return stockAnalyticsService.getStockFundamentals(stockFundamentalsRequest.getTickerSymbolList());
+
+
     }
 }

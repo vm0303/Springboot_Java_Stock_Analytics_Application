@@ -39,4 +39,7 @@ public class StocksHistoryRequest {
     public void setToDate(LocalDate toDate) {
         this.toDate = toDate;
     }
+
+
+
 }
