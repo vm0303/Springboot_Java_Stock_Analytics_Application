@@ -1,17 +1,32 @@
-package io.endeavour.stocks.vo;
+package io.endeavour.stocks.entity.stocks;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Objects;
 
-public class StockFundamentalsVO
+@Entity
+@Table(name = "STOCK_FUNDAMENTALS", schema = "ENDEAVOUR")
+public class StockFundamentals
 {
+    @Column(name = "TICKER_SYMBOL")
+    @Id
     private String tickerSymbols;
+
+    @Column(name = "SECTOR_ID")
     private int sectorID;
 
+    @Column(name = "SUBSECTOR_ID")
     private int subsectorID;
+
+
+    @Column(name = "MARKET_CAP")
     private BigDecimal marketCap;
 
-    private double currentRatio;
+    @Column(name = "CURRENT_RATIO")
+    private BigDecimal currentRatio;
 
     public String getTickerSymbols() {
         return tickerSymbols;
@@ -19,22 +34,6 @@ public class StockFundamentalsVO
 
     public void setTickerSymbols(String tickerSymbols) {
         this.tickerSymbols = tickerSymbols;
-    }
-
-    public BigDecimal getMarketCap() {
-        return marketCap;
-    }
-
-    public void setMarketCap(BigDecimal marketCap) {
-        this.marketCap = marketCap;
-    }
-
-    public double getCurrentRatio() {
-        return currentRatio;
-    }
-
-    public void setCurrentRatio(double currentRatio) {
-        this.currentRatio = currentRatio;
     }
 
     public int getSectorID() {
@@ -53,22 +52,41 @@ public class StockFundamentalsVO
         this.subsectorID = subsectorID;
     }
 
+    public BigDecimal getMarketCap() {
+        return marketCap;
+    }
+
+    public void setMarketCap(BigDecimal marketCap) {
+        this.marketCap = marketCap;
+    }
+
+    public BigDecimal getCurrentRatio() {
+        return currentRatio;
+    }
+
+    public void setCurrentRatio(BigDecimal currentRatio) {
+        this.currentRatio = currentRatio;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        StockFundamentalsVO that = (StockFundamentalsVO) o;
+        StockFundamentals that = (StockFundamentals) o;
         return Objects.equals(tickerSymbols, that.tickerSymbols);
     }
+
+
 
     @Override
     public int hashCode() {
         return Objects.hash(tickerSymbols);
     }
 
+
     @Override
     public String toString() {
-        final StringBuffer sb = new StringBuffer("StockFundamentalsVO{");
+        final StringBuffer sb = new StringBuffer("StockFundamentals{");
         sb.append("tickerSymbols='").append(tickerSymbols).append('\'');
         sb.append(", sectorID=").append(sectorID);
         sb.append(", subsectorID=").append(subsectorID);
@@ -78,4 +96,6 @@ public class StockFundamentalsVO
         return sb.toString();
     }
 }
+
+
 

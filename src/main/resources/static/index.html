@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <script type="text/javascript" src="json-to-table.js"></script>
+    <title>Springboot example</title>
+    <link href="styles.css" rel="stylesheet"/>
+</head>
+
+<body>
+<div id="url-form" class="input-form">
+    <label>
+        URL:
+<!--        <input id="url-input" value="http://localhost:8080/analytics/fundamentals/2017-01-01/2022-11-01"/>-->
+        <input id="url-input" value="http://localhost:8095/stockanalytics/top-50/sector/2017-01-01/2022-11-01"/>
+    </label>
+    <button id="fetch-data-btn">Fetch Data</button>
+</div>
+<div class="loader hide"></div>
+<table id="json-table" class="json-table"></table>
+<div id="error-container"></div>
+</body>
+</html>

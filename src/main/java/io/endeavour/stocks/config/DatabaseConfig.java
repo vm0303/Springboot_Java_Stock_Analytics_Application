@@ -2,6 +2,8 @@ package io.endeavour.stocks.config;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -12,18 +14,18 @@ import javax.sql.DataSource;
 @Configuration
 public class DatabaseConfig {
 
-    @Autowired
-    private DataSource dataSource;
+   @Bean
+    @ConfigurationProperties(prefix = "spring.datasource")
+    public DataSource dataSource()
+   {
+       return DataSourceBuilder.create().build();
+   }
 
-
-    /**
-     * Method to return a JDBC template for database connection
-     * @return JDBCTemplate
-     */
-    @Bean(name = "jdbcTemplate")
-    public JdbcTemplate getJdbcTemplate()
-    {
-        return new JdbcTemplate(dataSource);
-    }
+   @Bean (name = "dataSourceCrud")
+    @ConfigurationProperties (prefix = "spring.datasource-crudjpa")
+    public DataSource dataSourceCrud()
+   {
+       return DataSourceBuilder.create().build();
+   }
 
 }

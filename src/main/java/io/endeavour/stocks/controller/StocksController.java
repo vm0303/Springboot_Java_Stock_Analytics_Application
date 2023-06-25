@@ -1,6 +1,7 @@
 package io.endeavour.stocks.controller;
 
 
+import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import io.endeavour.stocks.service.StockAnalyticsService;
 import io.endeavour.stocks.vo.StockFundamentalsRequest;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
@@ -14,6 +15,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/stocks")
@@ -48,10 +50,22 @@ public class StocksController {
             @RequestParam(name = "fromDate", required = true)
             @DateTimeFormat (pattern = "MM-dd-yyyy") LocalDate fromDate,
             @RequestParam(name = "toDate", required = true)
-            @DateTimeFormat (pattern = "MM-dd-yyyy") LocalDate toDate
-    )
+            @DateTimeFormat (pattern = "MM-dd-yyyy") LocalDate toDate,
+            @RequestParam( name = "sortField" , required = false)Optional<String> sortFieldOptional,
+            @RequestParam( name = "sortDirection" , required = false)Optional<String> sortDirectionOptional
+            )
     {
-        return stockAnalyticsService.singleStocksPriceHistoryDAOList(tickerSymbol, fromDate, toDate);
+        List<StockPriceHistoryVo> stockPriceHistoryVoList;
+        try
+        {
+            stockPriceHistoryVoList =stockAnalyticsService.singleStocksPriceHistoryDAOList(tickerSymbol, fromDate, toDate, sortFieldOptional, sortDirectionOptional);
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sortfield entered is not valid");
+        }
+        return stockPriceHistoryVoList;
+
     }
 
     @PostMapping(value = "/getStocksPriceHistory")
@@ -66,6 +80,7 @@ public class StocksController {
                 stocksHistoryRequest.getFromDate(), stocksHistoryRequest.getToDate());
     }
 
+    //http://localhost:8095/stockanalytics/stocks/singleStockPriceHistory/TSLA?fromDate=03-01-2023&toDate=03-31-2023&sortField=openPrice&sortDirection=dsc
     @PostMapping(value = "/getStockFundamentals")
     public List<StockFundamentalsVO> getStockFundamentals(@RequestBody StockFundamentalsRequest stockFundamentalsRequest)
     {
@@ -74,7 +89,11 @@ public class StocksController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The Array list of ticker symbols cannot be null");
         }
       return stockAnalyticsService.getStockFundamentals(stockFundamentalsRequest.getTickerSymbolList());
+    }
 
-
+    @GetMapping(value ="/getAllStockFundamentalsJPA")
+    public List<StockFundamentals> getAllStockFundamentalsJPA()
+    {
+        return stockAnalyticsService.getAllStockFundamentalsJPA();
     }
 }

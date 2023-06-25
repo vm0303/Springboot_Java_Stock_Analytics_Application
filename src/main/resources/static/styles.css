@@ -1,0 +1,85 @@
+* {
+    font-family: sans-serif;
+}
+
+.input-form {
+    width: 95%;
+}
+
+.input-form input {
+    margin-top: 0.5em;
+    padding: 5px;
+    width: 100%;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.input-form button {
+    margin-top: 1em;
+}
+
+.json-table {
+    border-collapse: collapse;
+    margin: 25px 0;
+    font-size: 0.9em;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.15);
+}
+
+.json-table thead tr {
+    background-color: #444;
+    color: #ffffff;
+    text-align: left;
+    position: sticky;
+    top: 0;
+}
+
+.json-table th {
+    text-transform: capitalize;
+}
+
+.json-table th,
+.json-table td {
+    padding: 6px 8px;
+    text-align: left;
+}
+
+.json-table tbody tr {
+    border-bottom: 1px solid #dddddd;
+}
+
+.json-table tbody tr:nth-of-type(even) {
+    background-color: #f3f3f3;
+}
+
+.json-table tbody tr:last-of-type {
+    border-bottom: 2px solid #444;
+}
+
+.hide {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
+.loader {
+    margin-top: 1em;
+    width: 20px;
+    padding: 8px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #e1e1e1;
+    --_m: conic-gradient(#0000 10%, #000),
+    linear-gradient(#000 0 0) content-box;
+    -webkit-mask: var(--_m);
+    mask: var(--_m);
+    -webkit-mask-composite: source-out;
+    mask-composite: subtract;
+    animation: spinner 1s infinite linear;
+}
+
+@keyframes spinner {
+    to {
+        transform: rotate(1turn)
+    }
+}
