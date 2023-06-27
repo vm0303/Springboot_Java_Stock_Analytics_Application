@@ -4,7 +4,7 @@ import io.endeavour.stocks.dao.PriceHistoryDAO;
 import io.endeavour.stocks.dao.SingleStocksPriceHistoryDAO;
 import io.endeavour.stocks.dao.StockFundamentalsDAO;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
-import io.endeavour.stocks.repositroy.stocks.StockFundamentalsRepository;
+import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVo;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +38,33 @@ public class StockAnalyticsService
     }
 
 
-    public List<StockFundamentals> getAllStockFundamentalsJPA()
+    public List<StockFundamentals> getAllStockFundamentalsJPA(Optional<String> sortFieldOptional, Optional<String> sortDirectionOptional)
     {
-        return stockFundamentalsRepository.findAll();
+        String sortField = sortFieldOptional.orElse("tickerSymbol");
+        String sortDirection = sortDirectionOptional.orElse("asc");
+
+        List<StockFundamentals> stockFundamentalsList = stockFundamentalsRepository.findAll();
+
+
+        Comparator sortComparatorSF = switch (sortField)
+        {
+            case("tickerSymbol") -> Comparator.comparing(StockFundamentals::getTickerSymbols);
+            case("marketCap") -> Comparator.comparing(StockFundamentals::getMarketCap);
+            case("currentRatio") -> Comparator.comparing(StockFundamentals::getCurrentRatio);
+            case("subsectorID") -> Comparator.comparing(StockFundamentals::getSubsectorID);
+            case("sectorID") -> Comparator.comparing(StockFundamentals::getSectorID);
+            default -> throw new IllegalArgumentException("Unexpected value entered: " + sortField);
+        };
+
+
+
+
+        if(sortDirection.equalsIgnoreCase("dsc"))
+            sortComparatorSF = sortComparatorSF.reversed();
+
+        stockFundamentalsList.sort(sortComparatorSF);
+
+        return stockFundamentalsList;
     }
 
 

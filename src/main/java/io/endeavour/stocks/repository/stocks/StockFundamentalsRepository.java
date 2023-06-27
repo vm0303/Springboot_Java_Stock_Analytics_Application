@@ -1,4 +1,4 @@
-package io.endeavour.stocks.repositroy.stocks;
+package io.endeavour.stocks.repository.stocks;
 
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import org.springframework.data.jpa.repository.JpaRepository;

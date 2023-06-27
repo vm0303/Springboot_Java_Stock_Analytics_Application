@@ -44,6 +44,7 @@ public class StocksController {
 
     }
 
+    //http://localhost:8095/stockanalytics/stocks/singleStockPriceHistory/TSLA?fromDate=03-01-2023&toDate=03-31-2023&sortField=openPrice&sortDirection=dsc
     @GetMapping(value = "/singleStockPriceHistory/{tickerSymbol}")
     public List<StockPriceHistoryVo> getSingleStockPriceHistoryList(
             @PathVariable(name = "tickerSymbol") String tickerSymbol,
@@ -71,7 +72,7 @@ public class StocksController {
     @PostMapping(value = "/getStocksPriceHistory")
     public List<StockPriceHistoryVo> getStockPriceHistory(@RequestBody StocksHistoryRequest stocksHistoryRequest)
     {
-        //This will give a bad request, if the from date is greater than to date.
+        //This will give a bad request, if the fromDate is greater than toDate.
         if(stocksHistoryRequest.getFromDate().compareTo(stocksHistoryRequest.getToDate())>0)
         {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fromDate cannot be greater than toDate");
@@ -80,7 +81,7 @@ public class StocksController {
                 stocksHistoryRequest.getFromDate(), stocksHistoryRequest.getToDate());
     }
 
-    //http://localhost:8095/stockanalytics/stocks/singleStockPriceHistory/TSLA?fromDate=03-01-2023&toDate=03-31-2023&sortField=openPrice&sortDirection=dsc
+
     @PostMapping(value = "/getStockFundamentals")
     public List<StockFundamentalsVO> getStockFundamentals(@RequestBody StockFundamentalsRequest stockFundamentalsRequest)
     {
@@ -92,8 +93,22 @@ public class StocksController {
     }
 
     @GetMapping(value ="/getAllStockFundamentalsJPA")
-    public List<StockFundamentals> getAllStockFundamentalsJPA()
+
+    public List<StockFundamentals> getAllStockFundamentalsJPA
+            ( @RequestParam( name = "sortField" , required = false)Optional<String> sortFieldOptional,
+              @RequestParam( name = "sortDirection" , required = false)Optional<String> sortDirectionOptional
+            )
     {
-        return stockAnalyticsService.getAllStockFundamentalsJPA();
+        List<StockFundamentals> stockFundamentalsListByEntity;
+        try
+        {
+            stockFundamentalsListByEntity = stockAnalyticsService.getAllStockFundamentalsJPA(sortFieldOptional,sortDirectionOptional);
+        }
+        catch (IllegalArgumentException e)
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sortfield entered is not valid");
+        }
+        return stockFundamentalsListByEntity;
     }
 }
+

@@ -16,10 +16,10 @@ public class StockFundamentals
     private String tickerSymbols;
 
     @Column(name = "SECTOR_ID")
-    private int sectorID;
+    private Integer sectorID;
 
     @Column(name = "SUBSECTOR_ID")
-    private int subsectorID;
+    private Integer subsectorID;
 
 
     @Column(name = "MARKET_CAP")
@@ -36,7 +36,7 @@ public class StockFundamentals
         this.tickerSymbols = tickerSymbols;
     }
 
-    public int getSectorID() {
+    public Integer getSectorID() {
         return sectorID;
     }
 
@@ -44,7 +44,7 @@ public class StockFundamentals
         this.sectorID = sectorID;
     }
 
-    public int getSubsectorID() {
+    public Integer getSubsectorID() {
         return subsectorID;
     }
 
