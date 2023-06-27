@@ -19,7 +19,7 @@ public class Person {
     @Column (name = "DOB")
     private LocalDate dob;
 
-    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "person", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     List<Address> addressList;
 
     public List<Address> getAddressList() {

@@ -1,6 +1,7 @@
 package io.endeavour.stocks.controller;
 
 
+import io.endeavour.stocks.entity.crud.Person;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import io.endeavour.stocks.service.StockAnalyticsService;
 import io.endeavour.stocks.vo.StockFundamentalsRequest;
@@ -110,5 +111,6 @@ public class StocksController {
         }
         return stockFundamentalsListByEntity;
     }
+
 }
 

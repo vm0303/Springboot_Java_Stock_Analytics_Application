@@ -10,6 +10,7 @@ import io.endeavour.stocks.vo.StockPriceHistoryVo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
@@ -49,14 +50,12 @@ public class StockAnalyticsService
         Comparator sortComparatorSF = switch (sortField)
         {
             case("tickerSymbol") -> Comparator.comparing(StockFundamentals::getTickerSymbols);
-            case("marketCap") -> Comparator.comparing(StockFundamentals::getMarketCap);
-            case("currentRatio") -> Comparator.comparing(StockFundamentals::getCurrentRatio);
+            case("marketCap") -> Comparator.comparing(StockFundamentals::getMarketCap, Comparator.nullsFirst(BigDecimal::compareTo));
+            case("currentRatio") -> Comparator.comparing(StockFundamentals::getCurrentRatio, Comparator.nullsFirst(BigDecimal::compareTo));
             case("subsectorID") -> Comparator.comparing(StockFundamentals::getSubsectorID);
             case("sectorID") -> Comparator.comparing(StockFundamentals::getSectorID);
             default -> throw new IllegalArgumentException("Unexpected value entered: " + sortField);
         };
-
-
 
 
         if(sortDirection.equalsIgnoreCase("dsc"))
