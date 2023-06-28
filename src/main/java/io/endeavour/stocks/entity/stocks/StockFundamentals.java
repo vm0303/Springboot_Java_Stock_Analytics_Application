@@ -1,14 +1,50 @@
 package io.endeavour.stocks.entity.stocks;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import io.endeavour.stocks.vo.TopStocksBySector;
+
+import javax.persistence.*;
 import java.math.BigDecimal;
 import java.util.Objects;
 
 @Entity
 @Table(name = "STOCK_FUNDAMENTALS", schema = "ENDEAVOUR")
+@NamedNativeQuery(name="StockFundamentals.TopStocksBySector", query = """
+        WITH MARKETCP_RANK_TABLE AS (
+            SELECT
+                sf.SECTOR_ID,
+                sl2.SECTOR_NAME,
+                sf.TICKER_SYMBOL,
+                sl.TICKER_NAME,
+                sf.MARKET_CAP,
+                RANK() OVER (PARTITION BY sf.SECTOR_ID ORDER BY sf.MARKET_CAP desc) AS MKCP_RANK
+            FROM
+                ENDEAVOUR.STOCK_FUNDAMENTALS sf,
+                ENDEAVOUR.STOCKS_LOOKUP sl,
+                ENDEAVOUR.SECTOR_LOOKUP sl2\s
+            WHERE
+                sf.MARKET_CAP IS NOT NULL
+                AND sf.TICKER_SYMBOL = sl.TICKER_SYMBOL
+                AND sf.SECTOR_ID = sl2.SECTOR_ID
+        )
+        SELECT
+                mrt.SECTOR_ID,
+                mrt.SECTOR_NAME,
+                mrt.TICKER_SYMBOL,
+                mrt.TICKER_NAME,
+                mrt.MARKET_CAP
+        FROM
+           MARKETCP_RANK_TABLE mrt
+        WHERE
+            mrt.MKCP_RANK=1
+        """ ,resultSetMapping = "StockFundamentals.TopStocksBySectorMapping")
+@SqlResultSetMapping(name = "StockFundamentals.TopStocksBySectorMapping",
+classes = @ConstructorResult(targetClass = TopStocksBySector.class, columns = {
+        @ColumnResult(name ="SECTOR_ID", type =Integer.class),
+        @ColumnResult(name ="SECTOR_NAME", type =String.class),
+        @ColumnResult(name ="TICKER_SYMBOL", type =String.class),
+        @ColumnResult(name ="TICKER_NAME", type =String.class),
+        @ColumnResult(name ="MARKET_CAP", type =BigDecimal.class),
+}))
 public class StockFundamentals
 {
     @Column(name = "TICKER_SYMBOL")

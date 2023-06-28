@@ -5,10 +5,14 @@ import io.endeavour.stocks.dao.SingleStocksPriceHistoryDAO;
 import io.endeavour.stocks.dao.StockFundamentalsDAO;
 import io.endeavour.stocks.entity.stocks.Sector;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.entity.stocks.StocksPriceHistory;
+import io.endeavour.stocks.entity.stocks.StocksPriceHistoryPk;
 import io.endeavour.stocks.repository.stocks.SectorRepository;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
+import io.endeavour.stocks.repository.stocks.StocksPriceHistoryRepository;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVo;
+import io.endeavour.stocks.vo.TopStocksBySector;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,17 +35,20 @@ public class StockAnalyticsService
 
     private SectorRepository sectorRepository;
 
+    private StocksPriceHistoryRepository stocksPriceHistoryRepository;
+
 
 
     @Autowired
     public StockAnalyticsService(SingleStocksPriceHistoryDAO singleStocksPriceHistoryDAO, PriceHistoryDAO priceHistoryDAO,
                                 StockFundamentalsDAO stockFundamentalsDAO, StockFundamentalsRepository stockFundamentalsRepository,
-                                SectorRepository sectorRepository) {
+                                SectorRepository sectorRepository, StocksPriceHistoryRepository stocksPriceHistoryRepository) {
         this.singleStocksPriceHistoryDAO = singleStocksPriceHistoryDAO;
         this.priceHistoryDAO = priceHistoryDAO;
         this.stockFundamentalsDAO =stockFundamentalsDAO;
         this.stockFundamentalsRepository = stockFundamentalsRepository;
         this.sectorRepository = sectorRepository;
+        this.stocksPriceHistoryRepository = stocksPriceHistoryRepository;
     }
 
 
@@ -122,6 +129,19 @@ public class StockAnalyticsService
         Optional<Sector> optionalSectorByID = sectorRepository.findById(sectorID);
 
         return optionalSectorByID;
+    }
+
+    public Optional<StocksPriceHistory> getStocksPriceHistoryJPA(String tickerSymbol, LocalDate tradingDate)
+    {
+        StocksPriceHistoryPk stocksPriceHistoryPk = new StocksPriceHistoryPk();
+        stocksPriceHistoryPk.setTickerSymbol(tickerSymbol);
+        stocksPriceHistoryPk.setTradingDate(tradingDate);
+        return stocksPriceHistoryRepository.findById(stocksPriceHistoryPk);
+    }
+
+    public List<TopStocksBySector> getTopStocksBySectorList()
+    {
+        return stockFundamentalsRepository.getTopStocksBySector();
     }
 }
 

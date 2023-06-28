@@ -3,12 +3,9 @@ package io.endeavour.stocks.controller;
 
 import io.endeavour.stocks.entity.stocks.Sector;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
-import io.endeavour.stocks.service.CrudService;
+import io.endeavour.stocks.entity.stocks.StocksPriceHistory;
 import io.endeavour.stocks.service.StockAnalyticsService;
-import io.endeavour.stocks.vo.StockFundamentalsRequest;
-import io.endeavour.stocks.vo.StockFundamentalsVO;
-import io.endeavour.stocks.vo.StockPriceHistoryVo;
-import io.endeavour.stocks.vo.StocksHistoryRequest;
+import io.endeavour.stocks.vo.*;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -131,6 +128,21 @@ public class StocksController {
         }
         stockAnalyticsService.getSector(sectorID);
         return ResponseEntity.of(stockAnalyticsService.getSector(sectorID));
+    }
+
+
+    @GetMapping(value = "/getStocksPriceHistoryJPA")
+    public ResponseEntity<StocksPriceHistory> getStocksPriceHistoryJPA(@RequestParam(value = "tickerSymbol") String tickerSymbol,
+                                                                       @RequestParam(value = "tradingDate") @DateTimeFormat(pattern = "MM-dd-yyyy") LocalDate tradingDate)
+    {
+            return ResponseEntity.of(stockAnalyticsService.getStocksPriceHistoryJPA(tickerSymbol,tradingDate));
+    }
+
+
+    @GetMapping(value = "/getTopStocksBySector")
+    public List<TopStocksBySector> getTopStocksBySectorList ()
+    {
+        return stockAnalyticsService.getTopStocksBySectorList();
     }
 }
 
