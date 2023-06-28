@@ -23,7 +23,7 @@ import javax.sql.DataSource;
                 transactionManagerRef = "crudTransactionManager"
         )
 @EntityScan(basePackages = {
-       "io.endeavour.stocks.entity.crud", "io.endeavour.stocks.entity.stocks"
+       "io.endeavour.stocks.entity.crud"
 })
 
 
