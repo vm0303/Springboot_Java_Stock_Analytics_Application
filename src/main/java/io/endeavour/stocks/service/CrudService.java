@@ -3,7 +3,9 @@ package io.endeavour.stocks.service;
 import io.endeavour.stocks.StocksException;
 import io.endeavour.stocks.entity.crud.Address;
 import io.endeavour.stocks.entity.crud.Person;
+import io.endeavour.stocks.entity.stocks.Sector;
 import io.endeavour.stocks.repository.crud.PersonRepository;
+import io.endeavour.stocks.repository.stocks.SectorRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,9 +16,13 @@ public class CrudService
 {
         private PersonRepository personRepository;
 
-    public CrudService(PersonRepository personRepository) {
+
+    public CrudService(PersonRepository personRepository,SectorRepository sectorRepository) {
         this.personRepository = personRepository;
+
+
     }
+
 
     public List<Person> getAllPersons()
     {
@@ -29,6 +35,8 @@ public class CrudService
         return personOptional;
 
     }
+
+
 
     public Person savePerson(Person person) {
         Optional<List<Address>> addressListOptional = Optional.ofNullable(person.getAddressList());
@@ -62,4 +70,7 @@ public class CrudService
         }
 
     }
+
+
+
 }

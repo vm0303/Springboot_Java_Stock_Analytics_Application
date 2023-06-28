@@ -1,8 +1,9 @@
 package io.endeavour.stocks.controller;
 
 
-import io.endeavour.stocks.entity.crud.Person;
+import io.endeavour.stocks.entity.stocks.Sector;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.service.CrudService;
 import io.endeavour.stocks.service.StockAnalyticsService;
 import io.endeavour.stocks.vo.StockFundamentalsRequest;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
@@ -10,6 +11,7 @@ import io.endeavour.stocks.vo.StockPriceHistoryVo;
 import io.endeavour.stocks.vo.StocksHistoryRequest;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -23,6 +25,8 @@ import java.util.Optional;
 public class StocksController {
 
     private StockAnalyticsService stockAnalyticsService;
+
+
 
     public StocksController(StockAnalyticsService stockAnalyticsService) {
         this.stockAnalyticsService = stockAnalyticsService;
@@ -112,5 +116,21 @@ public class StocksController {
         return stockFundamentalsListByEntity;
     }
 
+    @GetMapping(value = "/getAllSectors")
+    public List<Sector> getAllSectors()
+    {
+        return stockAnalyticsService.getAllSectors();
+    }
+
+    @GetMapping(value = "/sector")
+    public ResponseEntity<Sector> getSector(@RequestParam(value = "sectorID", required = false) Integer sectorID)
+    {
+        if(sectorID==null)
+        {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sector ID sent is blank");
+        }
+        stockAnalyticsService.getSector(sectorID);
+        return ResponseEntity.of(stockAnalyticsService.getSector(sectorID));
+    }
 }
 

@@ -22,7 +22,12 @@ import javax.sql.DataSource;
                 entityManagerFactoryRef = "crudEntityManagerFactory",
                 transactionManagerRef = "crudTransactionManager"
         )
-@EntityScan(basePackages = "io.endeavour.stocks.entity.crud")
+@EntityScan(basePackages = {
+       "io.endeavour.stocks.entity.crud", "io.endeavour.stocks.entity.stocks"
+})
+
+
+
 public class CrudJPAConfig
 {
     @Autowired

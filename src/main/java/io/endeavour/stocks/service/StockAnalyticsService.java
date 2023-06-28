@@ -3,7 +3,9 @@ package io.endeavour.stocks.service;
 import io.endeavour.stocks.dao.PriceHistoryDAO;
 import io.endeavour.stocks.dao.SingleStocksPriceHistoryDAO;
 import io.endeavour.stocks.dao.StockFundamentalsDAO;
+import io.endeavour.stocks.entity.stocks.Sector;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
+import io.endeavour.stocks.repository.stocks.SectorRepository;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
 import io.endeavour.stocks.vo.StockFundamentalsVO;
 import io.endeavour.stocks.vo.StockPriceHistoryVo;
@@ -27,15 +29,19 @@ public class StockAnalyticsService
 
     private StockFundamentalsRepository stockFundamentalsRepository;
 
+    private SectorRepository sectorRepository;
+
 
 
     @Autowired
     public StockAnalyticsService(SingleStocksPriceHistoryDAO singleStocksPriceHistoryDAO, PriceHistoryDAO priceHistoryDAO,
-                                StockFundamentalsDAO stockFundamentalsDAO, StockFundamentalsRepository stockFundamentalsRepository) {
+                                StockFundamentalsDAO stockFundamentalsDAO, StockFundamentalsRepository stockFundamentalsRepository,
+                                SectorRepository sectorRepository) {
         this.singleStocksPriceHistoryDAO = singleStocksPriceHistoryDAO;
         this.priceHistoryDAO = priceHistoryDAO;
         this.stockFundamentalsDAO =stockFundamentalsDAO;
         this.stockFundamentalsRepository = stockFundamentalsRepository;
+        this.sectorRepository = sectorRepository;
     }
 
 
@@ -106,5 +112,16 @@ public class StockAnalyticsService
         return stockFundamentalsDAO.getStockFundamentals(tickerSymbolList);
     }
 
+    public List<Sector> getAllSectors()
+    {
+        return sectorRepository.findAll();
+    }
+
+    public Optional<Sector> getSector(Integer sectorID)
+    {
+        Optional<Sector> optionalSectorByID = sectorRepository.findById(sectorID);
+
+        return optionalSectorByID;
+    }
 }
 

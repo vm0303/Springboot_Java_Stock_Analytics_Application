@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.sql.SQLDataException;
-import java.sql.SQLException;
 import java.util.List;
 
 @RestController
@@ -27,13 +26,17 @@ public class CrudController
         this.crudService=crudService;
     }
 
+    // 1)Write a GET API to get Sector and Subsector details from the database using JPA
     @GetMapping(value = "/getAllPersons")
     public List<Person> getAllPersons()
     {
      return  crudService.getAllPersons();
     }
 
-    @GetMapping(value = "/erson")
+
+
+
+    @GetMapping(value = "/person")
     public ResponseEntity<Person> getPerson(@RequestParam(value = "personID", required = false) Integer personID)
     {
         if(personID==null)
@@ -43,6 +46,7 @@ public class CrudController
         crudService.getPerson(personID);
         return ResponseEntity.of(crudService.getPerson(personID));
     }
+
 
     @PostMapping(value = "/person")
     public Person savePerson(@RequestBody Person person)
@@ -80,3 +84,5 @@ public class CrudController
         return ResponseEntity.badRequest().body(e.getMessage());
     }
 }
+
+// 2)  Write an API to get sector lookup data by giving an id as input and get back the lookup data for that id

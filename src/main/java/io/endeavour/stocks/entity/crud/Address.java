@@ -47,7 +47,6 @@ public class Address {
     }
 
 
-
     public String getAddressType() {
         return addressType;
     }
