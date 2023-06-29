@@ -148,10 +148,11 @@ public class StockAnalyticsService
 
         List<FormattedTopStocksBySubSectorVO> finalOutputList = new ArrayList<>();
 
-        //Map has SubsectorName as key and list of subSectors as value
+        //Map has SubsectorName as key and list of subSectors as values
         Map<String, List<TopStocksBySubSectorVo>> subSectorByListMap = topStocksBySubSectorVoList.stream()
                 .collect(Collectors.groupingBy(TopStocksBySubSectorVo::getSubSectorName));
 
+        //For each  iterating of the map,
         subSectorByListMap.forEach((subSector, stocksList) -> {
             FormattedTopStocksBySubSectorVO formattedTopStocksBySubSectorVO = new FormattedTopStocksBySubSectorVO();
             formattedTopStocksBySubSectorVO.setSubSectorName(subSector);
@@ -178,5 +179,27 @@ public class StockAnalyticsService
 
         return finalOutputList;
     }
+
+    //Using Native SQL Query in StockFundamentals Repository class
+    public List<StockFundamentals> getTopNStocksByNativeSQL(Integer num)
+    {
+        return stockFundamentalsRepository.getTopNStocksUsingNativeSQL(num);
+    }
+
+    public List<StockFundamentals> allStocksFromStockFundamentals()
+    {
+        return stockFundamentalsRepository.getAllStocksFromStockFundamentals();
+    }
+
+    public List<StockFundamentals> getTopNStockFundamentalsUsingJPQL(Integer num)
+    {
+        return stockFundamentalsDAO.getTopNStocksUsingJPQL(num);
+    }
+
+    public List<StockFundamentals> getTopNStockFundamentalsUsingCriteria(Integer num)
+    {
+        return stockFundamentalsDAO.getTopNStocksUsingJPQL(num);
+    }
+
 }
 

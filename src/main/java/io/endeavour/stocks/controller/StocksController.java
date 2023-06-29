@@ -150,5 +150,35 @@ public class StocksController {
     {
         return stockAnalyticsService.getTopStocksBySubSectorList();
     }
+
+    @GetMapping(value = "/getTopNStocksUsingSQL/{num}")
+    public List<StockFundamentals> getTopNStocksUsingNativeSQL(@PathVariable(value = "num") Integer num)
+    {
+        return stockAnalyticsService.getTopNStocksByNativeSQL(num);
+    }
+
+
+
+
+
+
+    @GetMapping(value = "/getAllStocksFromSFJPQL")
+    public List<StockFundamentals> getAllStocksFromStockFundamentals()
+    {
+        return stockAnalyticsService.allStocksFromStockFundamentals();
+    }
+
+    @GetMapping(value = "/getTopNStocksUsingJPQL/{num}")
+    public List<StockFundamentals> getTopNStocksUsingJPQL(@PathVariable(value = "num") Integer num)
+    {
+        return stockAnalyticsService.getTopNStockFundamentalsUsingJPQL(num);
+    }
+
+    @GetMapping(value = "/getTopNStockFundamentalsUsingCriteria/{num}")
+    public List<StockFundamentals> getTopNStocksUsingCriteria(@PathVariable(value = "num") Integer num)
+    {
+        return stockAnalyticsService.getTopNStockFundamentalsUsingCriteria(num);
+    }
 }
+
 
