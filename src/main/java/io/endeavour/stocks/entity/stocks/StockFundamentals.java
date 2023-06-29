@@ -1,6 +1,7 @@
 package io.endeavour.stocks.entity.stocks;
 
 import io.endeavour.stocks.vo.TopStocksBySector;
+import io.endeavour.stocks.vo.TopStocksBySubSectorVo;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
@@ -20,7 +21,7 @@ import java.util.Objects;
             FROM
                 ENDEAVOUR.STOCK_FUNDAMENTALS sf,
                 ENDEAVOUR.STOCKS_LOOKUP sl,
-                ENDEAVOUR.SECTOR_LOOKUP sl2\s
+                ENDEAVOUR.SECTOR_LOOKUP sl2
             WHERE
                 sf.MARKET_CAP IS NOT NULL
                 AND sf.TICKER_SYMBOL = sl.TICKER_SYMBOL
@@ -45,6 +46,53 @@ classes = @ConstructorResult(targetClass = TopStocksBySector.class, columns = {
         @ColumnResult(name ="TICKER_NAME", type =String.class),
         @ColumnResult(name ="MARKET_CAP", type =BigDecimal.class),
 }))
+
+@NamedNativeQuery(name= "StockFundamentals.TopStocksBySubSector" , query = """
+         WITH MARKTCP_RANK_TABLE AS (
+                    SELECT
+                    sl.SUBSECTOR_NAME,
+                    sf.SUBSECTOR_ID,
+                    sl2.SECTOR_NAME,
+                    sf.TICKER_SYMBOL,
+                    sl3.TICKER_NAME,
+                    sf.MARKET_CAP,
+                    RANK() OVER (PARTITION BY sf.SUBSECTOR_ID ORDER BY sf.MARKET_CAP desc) AS MKCP_RANK
+                    FROM
+                    ENDEAVOUR.STOCK_FUNDAMENTALS sf,
+                    ENDEAVOUR.SUBSECTOR_LOOKUP sl,
+                    ENDEAVOUR.SECTOR_LOOKUP sl2,
+                    ENDEAVOUR.STOCKS_LOOKUP sl3
+                    WHERE
+                    sf.MARKET_CAP IS NOT NULL
+                    AND
+                    sf.SUBSECTOR_ID = sl.SUBSECTOR_ID
+                    AND
+                    sf.TICKER_SYMBOL = SL3.TICKER_SYMBOL
+                    AND
+                    sf.SECTOR_ID = sl.SECTOR_ID
+                    AND
+                    sf.SECTOR_ID = sl2.SECTOR_ID
+                    )
+                    SELECT
+                    mrt.SUBSECTOR_NAME,
+                    MRT.SUBSECTOR_ID,
+                    mrt.SECTOR_NAME,
+                    mrt.TICKER_SYMBOL,
+                    mrt.TICKER_NAME,
+                    mrt.MARKET_CAP
+                    FROM MARKTCP_RANK_TABLE mrt
+                    WHERE mrt.MKCP_RANK <=5
+                    ORDER BY SUBSECTOR_ID
+                    """, resultSetMapping = "StockFundamentals.TopStocksBySubSectorMapping")
+@SqlResultSetMapping(name = "StockFundamentals.TopStocksBySubSectorMapping",
+        classes = @ConstructorResult(targetClass = TopStocksBySubSectorVo.class, columns = {
+                @ColumnResult(name ="SUBSECTOR_NAME", type =String.class),
+                @ColumnResult(name ="SUBSECTOR_ID", type =Integer.class),
+                @ColumnResult(name ="SECTOR_NAME", type =String.class),
+                @ColumnResult(name ="TICKER_SYMBOL", type =String.class),
+                @ColumnResult(name ="TICKER_NAME", type =String.class),
+                @ColumnResult(name ="MARKET_CAP", type =BigDecimal.class),
+        }))
 public class StockFundamentals
 {
     @Column(name = "TICKER_SYMBOL")
@@ -55,7 +103,7 @@ public class StockFundamentals
     private Integer sectorID;
 
     @Column(name = "SUBSECTOR_ID")
-    private Integer subsectorID;
+    private Integer subSectorID;
 
 
     @Column(name = "MARKET_CAP")
@@ -76,16 +124,16 @@ public class StockFundamentals
         return sectorID;
     }
 
-    public void setSectorID(int sectorID) {
+    public void setSectorID(Integer sectorID) {
         this.sectorID = sectorID;
     }
 
-    public Integer getSubsectorID() {
-        return subsectorID;
+    public Integer getSubSectorID() {
+        return subSectorID;
     }
 
-    public void setSubsectorID(int subsectorID) {
-        this.subsectorID = subsectorID;
+    public void setSubSectorID(Integer subSectorID) {
+        this.subSectorID = subSectorID;
     }
 
     public BigDecimal getMarketCap() {
@@ -125,7 +173,7 @@ public class StockFundamentals
         final StringBuffer sb = new StringBuffer("StockFundamentals{");
         sb.append("tickerSymbols='").append(tickerSymbols).append('\'');
         sb.append(", sectorID=").append(sectorID);
-        sb.append(", subsectorID=").append(subsectorID);
+        sb.append(", subsectorID=").append(subSectorID);
         sb.append(", marketCap=").append(marketCap);
         sb.append(", currentRatio=").append(currentRatio);
         sb.append('}');

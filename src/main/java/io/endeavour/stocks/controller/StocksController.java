@@ -144,5 +144,11 @@ public class StocksController {
     {
         return stockAnalyticsService.getTopStocksBySectorList();
     }
+
+    @GetMapping(value = "/getTop5StocksBySubSector")
+    public List<FormattedTopStocksBySubSectorVO> getTopStocksBySubSectorList ()
+    {
+        return stockAnalyticsService.getTopStocksBySubSectorList();
+    }
 }
 

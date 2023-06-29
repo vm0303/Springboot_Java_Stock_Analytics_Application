@@ -1,7 +1,5 @@
 package io.endeavour.stocks.entity.stocks;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import javax.persistence.*;
 import java.util.Objects;
 
@@ -18,18 +16,6 @@ public class SubSector
     @Column(name = "SUBSECTOR_NAME")
     private String subSectorName;
 
-    @ManyToOne
-    @JsonIgnore
-    @JoinColumn(name = "SECTOR_ID")
-    Sector sector;
-
-    public Sector getSector() {
-        return sector;
-    }
-
-    public void setSector(Sector sector) {
-        this.sector = sector;
-    }
 
     public Integer getSubSectorID() {
         return subSectorID;

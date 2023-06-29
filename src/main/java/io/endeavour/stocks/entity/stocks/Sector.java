@@ -16,8 +16,7 @@ public class Sector
     @Column (name = "SECTOR_NAME")
     private String sectorName;
 
-    @OneToMany(mappedBy = "sector", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
-    List<SubSector> subsectorList;
+
 
     public Integer getSectorID() {
         return sectorID;
@@ -35,13 +34,6 @@ public class Sector
         this.sectorName = sectorName;
     }
 
-    public List<SubSector> getSubsectorList() {
-        return subsectorList;
-    }
-
-    public void setSubsectorList(List<SubSector> subsectorList) {
-        this.subsectorList = subsectorList;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -65,3 +57,5 @@ public class Sector
         return Objects.hash(sectorID);
     }
 }
+
+

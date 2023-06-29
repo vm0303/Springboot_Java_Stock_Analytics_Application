@@ -10,17 +10,14 @@ import io.endeavour.stocks.entity.stocks.StocksPriceHistoryPk;
 import io.endeavour.stocks.repository.stocks.SectorRepository;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
 import io.endeavour.stocks.repository.stocks.StocksPriceHistoryRepository;
-import io.endeavour.stocks.vo.StockFundamentalsVO;
-import io.endeavour.stocks.vo.StockPriceHistoryVo;
-import io.endeavour.stocks.vo.TopStocksBySector;
+import io.endeavour.stocks.vo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class StockAnalyticsService
@@ -65,7 +62,7 @@ public class StockAnalyticsService
             case("tickerSymbol") -> Comparator.comparing(StockFundamentals::getTickerSymbols);
             case("marketCap") -> Comparator.comparing(StockFundamentals::getMarketCap, Comparator.nullsFirst(BigDecimal::compareTo));
             case("currentRatio") -> Comparator.comparing(StockFundamentals::getCurrentRatio, Comparator.nullsFirst(BigDecimal::compareTo));
-            case("subsectorID") -> Comparator.comparing(StockFundamentals::getSubsectorID);
+            case("subsectorID") -> Comparator.comparing(StockFundamentals::getSubSectorID);
             case("sectorID") -> Comparator.comparing(StockFundamentals::getSectorID);
             default -> throw new IllegalArgumentException("Unexpected value entered: " + sortField);
         };
@@ -142,6 +139,44 @@ public class StockAnalyticsService
     public List<TopStocksBySector> getTopStocksBySectorList()
     {
         return stockFundamentalsRepository.getTopStocksBySector();
+    }
+
+
+    public List<FormattedTopStocksBySubSectorVO> getTopStocksBySubSectorList()
+    {
+        List<TopStocksBySubSectorVo> topStocksBySubSectorVoList = stockFundamentalsRepository.getTopStocksBySubSector();
+
+        List<FormattedTopStocksBySubSectorVO> finalOutputList = new ArrayList<>();
+
+        //Map has SubsectorName as key and list of subSectors as value
+        Map<String, List<TopStocksBySubSectorVo>> subSectorByListMap = topStocksBySubSectorVoList.stream()
+                .collect(Collectors.groupingBy(TopStocksBySubSectorVo::getSubSectorName));
+
+        subSectorByListMap.forEach((subSector, stocksList) -> {
+            FormattedTopStocksBySubSectorVO formattedTopStocksBySubSectorVO = new FormattedTopStocksBySubSectorVO();
+            formattedTopStocksBySubSectorVO.setSubSectorName(subSector);
+
+            List<StockVO> stockVOList = new ArrayList<>();
+
+            stocksList.forEach(topStocksBySubSectorVo ->
+            {
+                formattedTopStocksBySubSectorVO.setSubSectorID(topStocksBySubSectorVo.getSubSectorID());
+                formattedTopStocksBySubSectorVO.setSectorName(topStocksBySubSectorVo.getSectorName());
+
+                StockVO stockVO = new StockVO(topStocksBySubSectorVo.getTickerSymbol(), topStocksBySubSectorVo.getTickerName(),
+                        topStocksBySubSectorVo.getMarketCap());
+
+                stockVOList.add(stockVO);
+            });
+            formattedTopStocksBySubSectorVO.setTopStockList(stockVOList);
+            finalOutputList.add(formattedTopStocksBySubSectorVO);
+
+
+
+
+        });
+
+        return finalOutputList;
     }
 }
 
