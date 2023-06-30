@@ -17,7 +17,7 @@ public class SingleStocksPriceHistoryDAO
     private JdbcTemplate jdbcTemplate;
 
 
-    public List<StockPriceHistoryVo> stockPriceHistoryVoList (String tickerSymbol, LocalDate fromDate, LocalDate toDate)
+    public List<StockPriceHistoryVo> getStockPriceHistory (String tickerSymbol, LocalDate fromDate, LocalDate toDate)
     {
         String sqlQuery =
                     """

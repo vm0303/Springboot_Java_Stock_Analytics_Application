@@ -74,6 +74,9 @@ public class StockFundamentalsDAO
 
     }
 
+
+
+
     public List<StockFundamentals> getTopNStocksUsingCriteria(Integer num){
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<StockFundamentals> criteriaQuery = cb.createQuery(StockFundamentals.class);

@@ -157,11 +157,6 @@ public class StocksController {
         return stockAnalyticsService.getTopNStocksByNativeSQL(num);
     }
 
-
-
-
-
-
     @GetMapping(value = "/getAllStocksFromSFJPQL")
     public List<StockFundamentals> getAllStocksFromStockFundamentals()
     {
@@ -179,6 +174,15 @@ public class StocksController {
     {
         return stockAnalyticsService.getTopNStockFundamentalsUsingCriteria(num);
     }
+
+    @GetMapping(value = "/getStockFundamentalHistory")
+    public ResponseEntity<StockFundamentalsHistoryVO> getStockFundamentalHistory(@RequestParam(value = "tickerSymbol") String tickerSymbol,
+                                                                                @RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+                                                                                @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate){
+        return ResponseEntity.of(stockAnalyticsService.getStockFundamentalHistory(tickerSymbol,fromDate,toDate));
+
+    }
+
 }
 
 

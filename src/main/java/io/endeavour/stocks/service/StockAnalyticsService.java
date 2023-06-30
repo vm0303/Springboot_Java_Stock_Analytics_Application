@@ -61,7 +61,7 @@ public class StockAnalyticsService
         {
             case("tickerSymbol") -> Comparator.comparing(StockFundamentals::getTickerSymbols);
             case("marketCap") -> Comparator.comparing(StockFundamentals::getMarketCap, Comparator.nullsFirst(BigDecimal::compareTo));
-            case("currentRatio") -> Comparator.comparing(StockFundamentals::getCurrentRatio, Comparator.nullsFirst(BigDecimal::compareTo));
+            case("currentRatio") -> Comparator.comparing(StockFundamentals::getCurrentRatio);
             case("subsectorID") -> Comparator.comparing(StockFundamentals::getSubSectorID);
             case("sectorID") -> Comparator.comparing(StockFundamentals::getSectorID);
             default -> throw new IllegalArgumentException("Unexpected value entered: " + sortField);
@@ -85,7 +85,7 @@ public class StockAnalyticsService
         String sortDirection = sortDirectionOptional.orElse("asc");
 
 
-        List<StockPriceHistoryVo> stockPriceHistoryVoList = singleStocksPriceHistoryDAO.stockPriceHistoryVoList(tickerSymbol, fromDate, toDate);
+        List<StockPriceHistoryVo> stockPriceHistoryVoList = singleStocksPriceHistoryDAO.getStockPriceHistory(tickerSymbol, fromDate, toDate);
 
         Comparator sortComparator = switch (sortField)
         {
@@ -201,5 +201,25 @@ public class StockAnalyticsService
         return stockFundamentalsDAO.getTopNStocksUsingJPQL(num);
     }
 
+
+
+    public Optional<StockFundamentalsHistoryVO> getStockFundamentalHistory(String tickerSymbol, LocalDate fromDate, LocalDate toDate){
+        List<StockPriceHistoryVo> stockPriceHistoryList = singleStocksPriceHistoryDAO.getStockPriceHistory(tickerSymbol, fromDate, toDate);
+
+        Optional<StockFundamentals> stockFundamentalsOptional = stockFundamentalsRepository.findById(tickerSymbol);
+        StockFundamentalsHistoryVO  stockFundamentalHistoryVO = null;
+
+        if(stockFundamentalsOptional.isPresent()){
+            stockFundamentalHistoryVO = new StockFundamentalsHistoryVO();
+            stockFundamentalHistoryVO.setTickerSymbol(tickerSymbol);
+            stockFundamentalHistoryVO.setCurrentRatio(stockFundamentalsOptional.get().getCurrentRatio());
+            stockFundamentalHistoryVO.setMarketCap(stockFundamentalsOptional.get().getMarketCap());
+            stockFundamentalHistoryVO.setTradingHistory(stockPriceHistoryList);
+        }
+        Optional<StockFundamentalsHistoryVO> stockFundamentalHistoryOptional = Optional.ofNullable(stockFundamentalHistoryVO);
+        return stockFundamentalHistoryOptional;
+    }
+
 }
+
 
