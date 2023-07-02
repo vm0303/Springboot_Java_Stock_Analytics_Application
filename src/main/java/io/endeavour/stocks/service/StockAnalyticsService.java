@@ -152,43 +152,42 @@ public class StockAnalyticsService
     }
 
 
-    public List<FormattedTopStocksBySubSectorVO> getTopStocksBySubSectorList()
+    public List<FormattedTopStocksBySubSectorVO> getTop5StocksBySubSectorList()
     {
-        List<TopStocksBySubSectorVo> topStocksBySubSectorVoList = stockFundamentalsRepository.getTopStocksBySubSector();
-
+        List<TopStocksBySubSectorVo> topStocksBySubSectorList = stockFundamentalsRepository.getTopStocksBySubSector();
         List<FormattedTopStocksBySubSectorVO> finalOutputList = new ArrayList<>();
 
-        //Map has SubsectorName as key and list of subSectors as values
-        Map<String, List<TopStocksBySubSectorVo>> subSectorByListMap = topStocksBySubSectorVoList.stream()
+        //Map has SubSectorName as key and list of SubSectorStocks as value
+        Map<String, List<TopStocksBySubSectorVo>> subSectorListByNameMap = topStocksBySubSectorList.stream()
                 .collect(Collectors.groupingBy(TopStocksBySubSectorVo::getSubSectorName));
 
-        //For each  iterating of the map,
-        subSectorByListMap.forEach((subSector, stocksList) -> {
-            FormattedTopStocksBySubSectorVO formattedTopStocksBySubSectorVO = new FormattedTopStocksBySubSectorVO();
-            formattedTopStocksBySubSectorVO.setSubSectorName(subSector);
+        //For each iteration of the earlier map, populate a new FormattedTopStocksBySubSectorVO object
+        subSectorListByNameMap.forEach((subSectorName, stocksList) -> {
 
+            //This object represents each SubSector of the economy
+            FormattedTopStocksBySubSectorVO formattedTopStocksBySubSectorVO = new FormattedTopStocksBySubSectorVO();
+            formattedTopStocksBySubSectorVO.setSubSectorName(subSectorName);
+
+            //The below list represents the list of Top Stocks for each SubsSector
             List<StockVO> stockVOList = new ArrayList<>();
 
-            stocksList.forEach(topStocksBySubSectorVo ->
-            {
-                formattedTopStocksBySubSectorVO.setSubSectorID(topStocksBySubSectorVo.getSubSectorID());
-                formattedTopStocksBySubSectorVO.setSectorName(topStocksBySubSectorVo.getSectorName());
+            // For each iteration of the StockList, populate a unique StockVO object and add it to the List of Top Stocks for each subSector
+            stocksList.forEach(topStockBySubSectorVO -> {
+                formattedTopStocksBySubSectorVO.setSubSectorID(topStockBySubSectorVO.getSubSectorID());
+                formattedTopStocksBySubSectorVO.setSectorName(topStockBySubSectorVO.getSectorName());
 
-                StockVO stockVO = new StockVO(topStocksBySubSectorVo.getTickerSymbol(), topStocksBySubSectorVo.getTickerName(),
-                        topStocksBySubSectorVo.getMarketCap());
-
-                stockVOList.add(stockVO);
+                //The below object represents each Stock in the Top Stocks list
+                StockVO stockVO = new StockVO(topStockBySubSectorVO.getTickerSymbol(), topStockBySubSectorVO.getTickerName(),
+                        topStockBySubSectorVO.getMarketCap());
+                stockVOList.add(stockVO); //Adding each stock to the Top Stock list for each subSector
             });
-            formattedTopStocksBySubSectorVO.setTopStockList(stockVOList);
-            finalOutputList.add(formattedTopStocksBySubSectorVO);
-
-
-
-
+            formattedTopStocksBySubSectorVO.setTopStockList(stockVOList); // Set the topStockList into the SubSector Formatted Object
+            finalOutputList.add(formattedTopStocksBySubSectorVO); // Add the SubSector Formatted object to the final Output List
         });
-
         return finalOutputList;
+
     }
+
 
     //Using Native SQL Query in StockFundamentals Repository class
     public List<StockFundamentals> getTopNStocksByNativeSQL(Integer num)
@@ -261,7 +260,7 @@ public class StockAnalyticsService
 
         //This will filter the cumulative return to make sure it's not null, and sort it in descending order.
         List<StockFundamentals> finalOutputList = allStockList.stream()
-                .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() != null)
+                .filter(stockFundamentals -> stockFundamentals.getMarketCap() != null)
                 .filter(stockFundamentals-> stockFundamentals.getMarketCap().compareTo(new BigDecimal(String.valueOf(greaterThanMKCp)))>0)
                 .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() != null)
                 .sorted(Comparator.comparing(StockFundamentals::getCumulativeReturn).reversed())
@@ -271,6 +270,84 @@ public class StockAnalyticsService
         return finalOutputList;
 
     }
+
+    public List<FormattedTopStocksBySubSectorVO> getTop5StocksWithCumulativeReturn(LocalDate fromDate, LocalDate toDate)
+    {
+        List<TopStocksBySubSectorVo> topStocksBySubSectorVoList = stockFundamentalsRepository.getTopStocksBySubSector();
+
+        List<FormattedTopStocksBySubSectorVO> formattedTopStocksBySubSectorVOList
+                = new ArrayList<>();
+
+
+        List<String> allTickerSymbolsList = topStocksBySubSectorVoList.stream()
+                .map(TopStocksBySubSectorVo::getTickerSymbol)
+                .collect(Collectors.toList());
+
+        CumulativeReturnWebServiceInputVO cumulativeReturnWebServiceInputVO = new CumulativeReturnWebServiceInputVO();
+        cumulativeReturnWebServiceInputVO.setTickers(allTickerSymbolsList);
+
+
+        Map<String, List<TopStocksBySubSectorVo>> subSectorByListMap = topStocksBySubSectorVoList.stream()
+                .collect(Collectors.groupingBy(TopStocksBySubSectorVo::getSubSectorName));
+
+        subSectorByListMap.forEach((subSector, stocksList) -> {
+            FormattedTopStocksBySubSectorVO formattedTopStocksBySubSectorVO = new FormattedTopStocksBySubSectorVO();
+            formattedTopStocksBySubSectorVO.setSubSectorName(subSector);
+
+            List<CumulativeReturnWebServiceOutputVO> cumulativeReturnOutputList =
+                    stocksCalculationClient.getCumulativeReturn(fromDate, toDate,cumulativeReturnWebServiceInputVO);
+
+            Map<String, BigDecimal> cumulativeReturnByTickerSymbols = cumulativeReturnOutputList.stream().collect(Collectors.toMap(
+                    CumulativeReturnWebServiceOutputVO::getTickerSymbol,
+                    CumulativeReturnWebServiceOutputVO::getCumulativeReturn
+            ));
+
+            topStocksBySubSectorVoList.forEach(topStocksBySubSectorVo -> topStocksBySubSectorVo.setCumulativeReturn
+                    (cumulativeReturnByTickerSymbols.get(topStocksBySubSectorVo.getTickerSymbol())));
+
+            List<StockVO> stockVOList = new ArrayList<>();
+
+            stocksList.forEach(topStocksBySubSectorVo ->
+            {
+                formattedTopStocksBySubSectorVO.setSubSectorID(topStocksBySubSectorVo.getSubSectorID());
+                formattedTopStocksBySubSectorVO.setSectorName(topStocksBySubSectorVo.getSectorName());
+
+                StockVO stockVO = new StockVO(topStocksBySubSectorVo.getTickerSymbol(), topStocksBySubSectorVo.getTickerName(),
+                        topStocksBySubSectorVo.getMarketCap());
+
+                stockVO.setCumulativeReturn(cumulativeReturnByTickerSymbols.get(topStocksBySubSectorVo.getTickerSymbol()));
+
+                stockVOList.add(stockVO);
+            });
+            formattedTopStocksBySubSectorVO.setTopStockList(stockVOList);
+            formattedTopStocksBySubSectorVOList.add(formattedTopStocksBySubSectorVO);
+        });
+
+
+        List<FormattedTopStocksBySubSectorVO> finalOutputList = formattedTopStocksBySubSectorVOList.stream()
+                .map(formattedTopStocksBySubSectorVO ->
+                {
+                    List<StockVO> topStockList = formattedTopStocksBySubSectorVO.getTopStockList().stream()
+                            .filter(stockVO -> stockVO.getMarketCap() !=null)
+                            .filter(stockVO -> stockVO.getCumulativeReturn() !=null)
+                            .sorted(Comparator.comparing(StockVO::getCumulativeReturn).reversed())
+                            .collect(Collectors.toList());
+                    formattedTopStocksBySubSectorVO.setTopStockList(topStockList);
+
+                    return formattedTopStocksBySubSectorVO;
+                }).collect(Collectors.toList());
+
+        List<FormattedTopStocksBySubSectorVO> sortedFinalOutputList = finalOutputList.stream()
+                .sorted(Comparator.comparing(FormattedTopStocksBySubSectorVO::getSubSectorName))
+                .collect(Collectors.toList());
+
+        return sortedFinalOutputList;
+    }
+
+
+
+
+
 
 }
 

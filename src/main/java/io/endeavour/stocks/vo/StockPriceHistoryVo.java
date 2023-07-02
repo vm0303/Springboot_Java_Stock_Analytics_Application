@@ -1,5 +1,6 @@
 package io.endeavour.stocks.vo;
 
+import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
@@ -14,6 +15,8 @@ public class StockPriceHistoryVo {
 
     private BigDecimal closePrice;
     private long volume;
+
+
 
     public String getTickerSymbol() {
         return tickerSymbol;

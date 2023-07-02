@@ -94,44 +94,7 @@ classes = @ConstructorResult(targetClass = TopStocksBySector.class, columns = {
                 @ColumnResult(name ="MARKET_CAP", type =BigDecimal.class),
         }))
 
-/*@NamedNativeQuery(name = "StockFundamentals.StockByTickerSymbolAndDate", query =
-        """
-                SELECT\s
-                sf.MARKET_CAP,
-                sf.CURRENT_RATIO,
-                sph.TICKER_SYMBOL,
-                SPH.TRADING_DATE,
-                sph.CLOSE_PRICE,
-                sph.VOLUME\s
-                FROM\s
-                ENDEAVOUR.STOCK_FUNDAMENTALS sf,
-                ENDEAVOUR.STOCKS_PRICE_HISTORY sph
-                WHERE\s
-                sf.MARKET_CAP IS NOT NULL
-                AND\s
-                sf.CURRENT_RATIO IS NOT NULL\s
-                AND
-                sph.CLOSE_PRICE IS NOT NULL
-                AND
-                sf.TICKER_SYMBOL = SPH.TICKER_SYMBOL
-                AND
-                sf.TICKER_SYMBOL = ?
-                AND\s
-                SPH.TRADING_DATE BETWEEN  TO_DATE (?, 'yyyy-mm-dd')
-                AND TO_DATE (?, 'yyyy-mm-dd')
-                AND
-                sph.VOLUME IS NOT NULL
-                """, resultSetMapping = "StockFundamentals.StockByTickerNameAndDate")
-@SqlResultSetMapping(name="StockFundamentals.StockByTickerNameAndDate", classes = {
-        @ConstructorResult(targetClass = StockByTickerSymbolAndTradingDateVO.class, columns = {
-                @ColumnResult(name ="MARKET_CAP", type =BigDecimal.class),
-                @ColumnResult(name ="CURRENT_RATIO", type =Double.class),
-                @ColumnResult(name ="TICKER_SYMBOL", type =String.class),
-                @ColumnResult(name ="TRADING_DATE", type = LocalDate.class),
-                @ColumnResult(name ="CLOSE_PRICE", type =BigDecimal.class),
-                @ColumnResult(name ="VOLUME", type =Long.class)
-        })
-})*/
+
 
 public class StockFundamentals
 {

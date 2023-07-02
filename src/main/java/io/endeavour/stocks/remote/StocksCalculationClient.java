@@ -22,4 +22,6 @@ public interface StocksCalculationClient
                                                                  @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
                                                                  CumulativeReturnWebServiceInputVO cumulativeReturnWebServiceInputVO);
 
+
+
 }

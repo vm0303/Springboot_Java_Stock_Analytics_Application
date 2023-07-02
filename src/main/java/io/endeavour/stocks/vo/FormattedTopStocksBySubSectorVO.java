@@ -12,6 +12,8 @@ public class FormattedTopStocksBySubSectorVO
 
     List<StockVO> topStockList;
 
+
+
     public String getSubSectorName() {
         return subSectorName;
     }

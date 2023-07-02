@@ -147,10 +147,10 @@ public class StocksController {
     }
 
     @GetMapping(value = "/getTop5StocksBySubSector")
-    public List<FormattedTopStocksBySubSectorVO> getTopStocksBySubSectorList ()
-    {
-        return stockAnalyticsService.getTopStocksBySubSectorList();
+    public List<FormattedTopStocksBySubSectorVO> getTop5StocksBySubSector(){
+        return stockAnalyticsService.getTop5StocksBySubSectorList();
     }
+
 
     @GetMapping(value = "/getTopNStocksUsingSQL/{num}")
     public List<StockFundamentals> getTopNStocksUsingNativeSQL(@PathVariable(value = "num") Integer num)
@@ -191,6 +191,15 @@ public class StocksController {
                                                            @RequestParam(value = "greaterThanMKCp") Long greaterThanMKCp){
         return stockAnalyticsService.getTopNPerformingStocks(num,fromDate,toDate,greaterThanMKCp);
 
+    }
+
+    @GetMapping(value = "/getTop5StocksBySubSectorByCumulativeReturn")
+
+    public List<FormattedTopStocksBySubSectorVO> getTopStocksBySubSectorListWithCumulativeReturn
+            (@RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+             @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate)
+    {
+        return stockAnalyticsService.getTop5StocksWithCumulativeReturn(fromDate, toDate);
     }
 }
 
