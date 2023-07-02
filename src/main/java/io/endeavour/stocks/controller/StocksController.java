@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.websocket.server.PathParam;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -183,6 +184,14 @@ public class StocksController {
 
     }
 
+    @GetMapping(value = "getTopNPerformingStocks/{num}")
+    public List<StockFundamentals> getTopNPerformingStocks(@PathVariable(value = "num") Integer num,
+                                                                                 @RequestParam(value = "fromDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fromDate,
+                                                                                 @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate,
+                                                           @RequestParam(value = "greaterThanMKCp") Long greaterThanMKCp){
+        return stockAnalyticsService.getTopNPerformingStocks(num,fromDate,toDate,greaterThanMKCp);
+
+    }
 }
 
 

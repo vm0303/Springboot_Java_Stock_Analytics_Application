@@ -7,7 +7,7 @@ import java.util.List;
 public class StockFundamentalsHistoryVO
 {
     private String tickerSymbol;
-    private double currentRatio;
+    private BigDecimal currentRatio;
     private BigDecimal marketCap;
     private List<StockPriceHistoryVo> tradingHistory;
 
@@ -19,11 +19,11 @@ public class StockFundamentalsHistoryVO
         this.tickerSymbol = tickerSymbol;
     }
 
-    public double getCurrentRatio() {
+    public BigDecimal getCurrentRatio() {
         return currentRatio;
     }
 
-    public void setCurrentRatio(double currentRatio) {
+    public void setCurrentRatio(BigDecimal currentRatio) {
         this.currentRatio = currentRatio;
     }
 

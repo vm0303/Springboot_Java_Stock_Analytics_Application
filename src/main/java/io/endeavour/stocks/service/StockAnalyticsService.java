@@ -7,10 +7,15 @@ import io.endeavour.stocks.entity.stocks.Sector;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import io.endeavour.stocks.entity.stocks.StocksPriceHistory;
 import io.endeavour.stocks.entity.stocks.StocksPriceHistoryPk;
+import io.endeavour.stocks.remote.StocksCalculationClient;
+import io.endeavour.stocks.remote.vo.CumulativeReturnWebServiceInputVO;
+import io.endeavour.stocks.remote.vo.CumulativeReturnWebServiceOutputVO;
 import io.endeavour.stocks.repository.stocks.SectorRepository;
 import io.endeavour.stocks.repository.stocks.StockFundamentalsRepository;
 import io.endeavour.stocks.repository.stocks.StocksPriceHistoryRepository;
 import io.endeavour.stocks.vo.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,6 +28,8 @@ import java.util.stream.Collectors;
 public class StockAnalyticsService
 {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(StockAnalyticsService.class);
+
     private SingleStocksPriceHistoryDAO singleStocksPriceHistoryDAO;
     private PriceHistoryDAO priceHistoryDAO;
 
@@ -34,18 +41,21 @@ public class StockAnalyticsService
 
     private StocksPriceHistoryRepository stocksPriceHistoryRepository;
 
+    private StocksCalculationClient stocksCalculationClient;
+
 
 
     @Autowired
     public StockAnalyticsService(SingleStocksPriceHistoryDAO singleStocksPriceHistoryDAO, PriceHistoryDAO priceHistoryDAO,
                                 StockFundamentalsDAO stockFundamentalsDAO, StockFundamentalsRepository stockFundamentalsRepository,
-                                SectorRepository sectorRepository, StocksPriceHistoryRepository stocksPriceHistoryRepository) {
+                                SectorRepository sectorRepository, StocksPriceHistoryRepository stocksPriceHistoryRepository, StocksCalculationClient stocksCalculationClient) {
         this.singleStocksPriceHistoryDAO = singleStocksPriceHistoryDAO;
         this.priceHistoryDAO = priceHistoryDAO;
         this.stockFundamentalsDAO =stockFundamentalsDAO;
         this.stockFundamentalsRepository = stockFundamentalsRepository;
         this.sectorRepository = sectorRepository;
         this.stocksPriceHistoryRepository = stocksPriceHistoryRepository;
+        this.stocksCalculationClient = stocksCalculationClient;
     }
 
 
@@ -218,6 +228,48 @@ public class StockAnalyticsService
         }
         Optional<StockFundamentalsHistoryVO> stockFundamentalHistoryOptional = Optional.ofNullable(stockFundamentalHistoryVO);
         return stockFundamentalHistoryOptional;
+    }
+
+
+    public List<StockFundamentals> getTopNPerformingStocks(Integer num, LocalDate fromDate, LocalDate toDate, Long greaterThanMKCp)
+    {
+        List<StockFundamentals> allStockList = stockFundamentalsRepository.findAll();
+        LOGGER.info("Size of all stock list is {}", allStockList.size());
+        List<String> allTickerSymbolsList = allStockList.stream()
+                .map(stockFundamentals -> stockFundamentals.getTickerSymbols())
+                .collect(Collectors.toList());
+
+        CumulativeReturnWebServiceInputVO cumulativeReturnWebServiceInputVO = new CumulativeReturnWebServiceInputVO();
+        cumulativeReturnWebServiceInputVO.setTickers(allTickerSymbolsList);
+
+
+        List<CumulativeReturnWebServiceOutputVO> cumulativeReturnOutputList =
+                stocksCalculationClient.getCumulativeReturn(fromDate, toDate, cumulativeReturnWebServiceInputVO);
+
+        LOGGER.info("Size of cumulative return list is {}", cumulativeReturnOutputList.size());
+
+        //Generating a map with tickerSymbol as key and Cumulative Return as value
+        Map<String, BigDecimal> cumulativeReturnByTickerMap = cumulativeReturnOutputList.stream().collect(Collectors.toMap(
+                CumulativeReturnWebServiceOutputVO::getTickerSymbol,
+                CumulativeReturnWebServiceOutputVO::getCumulativeReturn
+        ));
+
+        //Iterate the AllStocks list and put the cumulative return values from the previous map into the list.
+        allStockList.forEach(stockFundamentals -> {
+            stockFundamentals.setCumulativeReturn(cumulativeReturnByTickerMap.get(stockFundamentals.getTickerSymbols()));
+        });
+
+        //This will filter the cumulative return to make sure it's not null, and sort it in descending order.
+        List<StockFundamentals> finalOutputList = allStockList.stream()
+                .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() != null)
+                .filter(stockFundamentals-> stockFundamentals.getMarketCap().compareTo(new BigDecimal(String.valueOf(greaterThanMKCp)))>0)
+                .filter(stockFundamentals -> stockFundamentals.getCumulativeReturn() != null)
+                .sorted(Comparator.comparing(StockFundamentals::getCumulativeReturn).reversed())
+                .limit(num)
+                .collect(Collectors.toList());
+
+        return finalOutputList;
+
     }
 
 }

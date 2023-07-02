@@ -150,7 +150,18 @@ public class StockFundamentals
     private BigDecimal marketCap;
 
     @Column(name = "CURRENT_RATIO")
-    private double currentRatio;
+    private BigDecimal currentRatio;
+
+    @Transient
+    private BigDecimal cumulativeReturn;
+
+    public BigDecimal getCumulativeReturn() {
+        return cumulativeReturn;
+    }
+
+    public void setCumulativeReturn(BigDecimal cumulativeReturn) {
+        this.cumulativeReturn = cumulativeReturn;
+    }
 
     public String getTickerSymbols() {
         return tickerSymbols;
@@ -184,11 +195,11 @@ public class StockFundamentals
         this.marketCap = marketCap;
     }
 
-    public double getCurrentRatio() {
+    public BigDecimal getCurrentRatio() {
         return currentRatio;
     }
 
-    public void setCurrentRatio(double currentRatio) {
+    public void setCurrentRatio(BigDecimal currentRatio) {
         this.currentRatio = currentRatio;
     }
 
