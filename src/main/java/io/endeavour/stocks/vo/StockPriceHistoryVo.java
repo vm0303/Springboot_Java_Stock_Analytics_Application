@@ -1,19 +1,28 @@
 package io.endeavour.stocks.vo;
 
+import io.swagger.v3.oas.annotations.media.Schema;
+
 import javax.persistence.Transient;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Objects;
 
+@Schema(name = "StocksPriceHistoryVO", description = "Contains a list of stocks and its history")
 public class StockPriceHistoryVo {
 
-
+    @Schema(name = "tickerSymbol", example = "TSLA")
     private String tickerSymbol;
+
+    @Schema(name = "tradingDate", example = "2023-05-15")
     private LocalDate tradingDate;
 
+    @Schema(name = "openPrice", example = "135.32")
     private BigDecimal openPrice;
 
+    @Schema(name = "closePrice", example = "156.43")
     private BigDecimal closePrice;
+
+    @Schema(name = "volume", example = "1232343538")
     private long volume;
 
 

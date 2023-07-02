@@ -6,6 +6,9 @@ import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import io.endeavour.stocks.entity.stocks.StocksPriceHistory;
 import io.endeavour.stocks.service.StockAnalyticsService;
 import io.endeavour.stocks.vo.*;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +23,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/stocks")
+@Tag( name= "Stock Analytics API", description = "This API publishes US Stock Market Trends.")
 public class StocksController {
 
     private StockAnalyticsService stockAnalyticsService;
@@ -72,11 +76,19 @@ public class StocksController {
 
     }
 
+
+    @Operation(method = "getStocksPriceHistory", description = "This API  call gives the " +
+            "stock price history information between the given dates for the given stocks ")
+    @ApiResponse(responseCode = "400",
+            description = "The API response will send a Bad Request code 400 if the fromDate is greater than toDate.")
+    @ApiResponse(responseCode = "200",
+            description = "The API response will return a list of stocks for the " +
+                    "given stocks if the dates are properly given.")
     @PostMapping(value = "/getStocksPriceHistory")
     public List<StockPriceHistoryVo> getStockPriceHistory(@RequestBody StocksHistoryRequest stocksHistoryRequest)
     {
         //This will give a bad request, if the fromDate is greater than toDate.
-        if(stocksHistoryRequest.getFromDate().compareTo(stocksHistoryRequest.getToDate())>0)
+        if(stocksHistoryRequest.getFromDate().isAfter(stocksHistoryRequest.getToDate()))
         {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "fromDate cannot be greater than toDate");
         }
@@ -85,6 +97,8 @@ public class StocksController {
     }
 
 
+    @Operation(method = "getStocksPriceHistory", description = "This API  call gives the " +
+            "stock price history information between the given dates for the given stocks ")
     @PostMapping(value = "/getStockFundamentals")
     public List<StockFundamentalsVO> getStockFundamentals(@RequestBody StockFundamentalsRequest stockFundamentalsRequest)
     {

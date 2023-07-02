@@ -50,7 +50,7 @@ public class PriceHistoryDAO {
             stockPriceHistoryVo.setTickerSymbol(rs.getString("TICKER_SYMBOL"));
             stockPriceHistoryVo.setTradingDate(rs.getDate("TRADING_DATE").toLocalDate());
             stockPriceHistoryVo.setOpenPrice(rs.getBigDecimal("OPEN_PRICE"));
-            stockPriceHistoryVo.setOpenPrice(rs.getBigDecimal("CLOSE_PRICE"));
+            stockPriceHistoryVo.setClosePrice(rs.getBigDecimal("CLOSE_PRICE"));
             stockPriceHistoryVo.setVolume(rs.getLong("VOLUME"));
             return stockPriceHistoryVo;
         });
