@@ -1,6 +1,7 @@
 package io.endeavour.stocks.controller;
 
 
+import io.endeavour.stocks.StocksException;
 import io.endeavour.stocks.entity.stocks.Sector;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import io.endeavour.stocks.entity.stocks.StocksPriceHistory;
@@ -17,6 +18,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.websocket.server.PathParam;
 import java.math.BigDecimal;
+import java.sql.SQLDataException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -214,6 +216,12 @@ public class StocksController {
              @RequestParam(value = "toDate") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate toDate)
     {
         return stockAnalyticsService.getTop5StocksWithCumulativeReturn(fromDate, toDate);
+    }
+
+    @ExceptionHandler({StocksException.class, SQLDataException.class})
+    public ResponseEntity<String> exceptionHandling(Exception e)
+    {
+        return ResponseEntity.internalServerError().body(e.getMessage());
     }
 }
 

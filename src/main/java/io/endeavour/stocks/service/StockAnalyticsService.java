@@ -1,5 +1,6 @@
 package io.endeavour.stocks.service;
 
+import io.endeavour.stocks.StocksException;
 import io.endeavour.stocks.dao.PriceHistoryDAO;
 import io.endeavour.stocks.dao.SingleStocksPriceHistoryDAO;
 import io.endeavour.stocks.dao.StockFundamentalsDAO;
@@ -230,6 +231,7 @@ public class StockAnalyticsService
     }
 
 
+    //Will use this method for Unit Testing
     public List<StockFundamentals> getTopNPerformingStocks(Integer num, LocalDate fromDate, LocalDate toDate, Long greaterThanMKCp)
     {
         List<StockFundamentals> allStockList = stockFundamentalsRepository.findAll();
@@ -247,6 +249,15 @@ public class StockAnalyticsService
 
         LOGGER.info("Size of cumulative return list is {}", cumulativeReturnOutputList.size());
 
+
+        if(cumulativeReturnOutputList == null || cumulativeReturnOutputList.isEmpty())
+        {
+            throw new StocksException("The Stock calculation Web Service is down.");
+        }
+        if(allStockList == null || allStockList.isEmpty())
+        {
+            throw new StocksException("The Stock database is down.");
+        }
         //Generating a map with tickerSymbol as key and Cumulative Return as value
         Map<String, BigDecimal> cumulativeReturnByTickerMap = cumulativeReturnOutputList.stream().collect(Collectors.toMap(
                 CumulativeReturnWebServiceOutputVO::getTickerSymbol,
