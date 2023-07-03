@@ -112,8 +112,8 @@ class StockAnalyticsServiceTest
         List<StockFundamentals> stockFundamentalsDummyList=
                 List.of(
                         createStockFundamentals("AAPL", new BigDecimal(150), new BigDecimal(2.54)) ,
-                        createStockFundamentals("AMD", new BigDecimal(150), new BigDecimal(2.24)),
-                        createStockFundamentals("HD", new BigDecimal(150), new BigDecimal(5.21))
+                        createStockFundamentals("TSLA", new BigDecimal(150), new BigDecimal(2.24)),
+                        createStockFundamentals("V", new BigDecimal(150), new BigDecimal(5.21))
                 );
 
 
@@ -130,9 +130,9 @@ class StockAnalyticsServiceTest
         Mockito.when(stocksCalculationClient.getCumulativeReturn(Mockito.any(), Mockito.any(), Mockito.any()))
                 .thenReturn(cumulativeReturnWebServiceOutputVODummyList);
 
-        List<StockFundamentals> topNPerformingStocksList = stockAnalyticsService.getTopNPerformingStocks(1, LocalDate.now().minusMonths(3),
+        List<StockFundamentals> topNPerformingStocksList = stockAnalyticsService.getTopNPerformingStocks(2, LocalDate.now().minusMonths(3),
                 LocalDate.now(), 0L);
 
-        assertEquals(1, topNPerformingStocksList.size());
+        assertEquals(2, topNPerformingStocksList.size());
     }
 }
