@@ -297,13 +297,13 @@ public class StockAnalyticsService
             List<CumulativeReturnWebServiceOutputVO> cumulativeReturnOutputList =
                     stocksCalculationClient.getCumulativeReturn(fromDate, toDate,cumulativeReturnWebServiceInputVO);
 
-            Map<String, BigDecimal> cumulativeReturnByTickerSymbols = cumulativeReturnOutputList.stream().collect(Collectors.toMap(
+            Map<String, BigDecimal> cumulativeReturnByTickerSymbolsMap = cumulativeReturnOutputList.stream().collect(Collectors.toMap(
                     CumulativeReturnWebServiceOutputVO::getTickerSymbol,
                     CumulativeReturnWebServiceOutputVO::getCumulativeReturn
             ));
 
             topStocksBySubSectorVoList.forEach(topStocksBySubSectorVo -> topStocksBySubSectorVo.setCumulativeReturn
-                    (cumulativeReturnByTickerSymbols.get(topStocksBySubSectorVo.getTickerSymbol())));
+                    (cumulativeReturnByTickerSymbolsMap.get(topStocksBySubSectorVo.getTickerSymbol())));
 
             List<StockVO> stockVOList = new ArrayList<>();
 
@@ -315,7 +315,7 @@ public class StockAnalyticsService
                 StockVO stockVO = new StockVO(topStocksBySubSectorVo.getTickerSymbol(), topStocksBySubSectorVo.getTickerName(),
                         topStocksBySubSectorVo.getMarketCap());
 
-                stockVO.setCumulativeReturn(cumulativeReturnByTickerSymbols.get(topStocksBySubSectorVo.getTickerSymbol()));
+                stockVO.setCumulativeReturn(cumulativeReturnByTickerSymbolsMap.get(topStocksBySubSectorVo.getTickerSymbol()));
 
                 stockVOList.add(stockVO);
             });

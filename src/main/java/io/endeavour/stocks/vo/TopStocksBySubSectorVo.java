@@ -17,7 +17,7 @@ public class TopStocksBySubSectorVo
 
     private BigDecimal marketCap;
 
-   @Transient
+
     private BigDecimal cumulativeReturn;
 
     public TopStocksBySubSectorVo(String subSectorName, Integer subSectorID, String sectorName, String tickerSymbol, String tickerName, BigDecimal marketCap) {
