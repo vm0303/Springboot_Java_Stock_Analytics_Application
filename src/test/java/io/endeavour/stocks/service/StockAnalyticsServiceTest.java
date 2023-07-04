@@ -1,6 +1,7 @@
 package io.endeavour.stocks.service;
 
 import io.endeavour.stocks.StocksException;
+import io.endeavour.stocks.UnitTestBase;
 import io.endeavour.stocks.entity.stocks.StockFundamentals;
 import io.endeavour.stocks.remote.StocksCalculationClient;
 import io.endeavour.stocks.remote.vo.CumulativeReturnWebServiceOutputVO;
@@ -18,9 +19,8 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-@SpringBootTest
-@ActiveProfiles({"test"})
-class StockAnalyticsServiceTest
+
+class StockAnalyticsServiceTest extends UnitTestBase
 {
     @Autowired
     StockAnalyticsService stockAnalyticsService;
